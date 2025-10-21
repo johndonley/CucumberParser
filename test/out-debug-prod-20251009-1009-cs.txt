@@ -1,0 +1,628 @@
+Using DEV environment
+Archive directory: C:/Dev-Ruby/TestReports/PRAPay-UK/archive
+
+Parsing base file: C:/Dev-Ruby/TestReports/PRAPay-UK/archive/prod-20251009-1009.htm
+Debug: File size: 1125983 bytes
+Debug: Found 1 feature div(s) in HTML
+Debug: First feature div: <div class="feature">
+Debug: Parsed 1 feature(s)
+Debug: Feature 1: 'Payment functionality should work correctly' with 8 scenario(s)
+Debug:   Scenario 1: 'Verify Got Letter login with Single Debit Payment' (ID: scenario_1)
+Debug:   Scenario 2: 'Verify Got Letter login with Single Bank Payment' (ID: scenario_2)
+Debug:   Scenario 3: 'Verify Got Letter login with Debit Payment Plan - Do Not Clear Balance' (ID: scenario_3)
+Debug:   Scenario 4: 'Verify Got Letter login with Debit Payment Plan - Clear Balance' (ID: scenario_4)
+Debug:   Scenario 5: 'Verify User Information login with Single Debit Payment' (ID: scenario_5)
+Debug:   Scenario 6: 'Verify User Information login Single Bank Payment' (ID: scenario_6)
+Debug:   Scenario 7: 'Verify User Information login Debit Payment Plan - Do Not Clear Balance' (ID: scenario_7)
+Debug:   Scenario 8: 'Verify User Information login Debit Payment Plan - Clear Balance' (ID: scenario_8)
+Parsing retest file: C:/Dev-Ruby/TestReports/PRAPay-UK/archive/prod-20251009-1009(retest).htm
+Debug: File size: 169140 bytes
+Debug: Found 1 feature div(s) in HTML
+Debug: First feature div: <div class="feature">
+Debug: Parsed 1 feature(s)
+Debug: Feature 1: 'Payment functionality should work correctly' with 2 scenario(s)
+Debug:   Scenario 1: 'Verify Got Letter login with Debit Payment Plan - Do Not Clear Balance' (ID: scenario_1)
+Debug:   Scenario 2: 'Verify User Information login Debit Payment Plan - Clear Balance' (ID: scenario_2)
+
+============================================================
+=== BASE REPORT ===
+============================================================
+
+--- RUN DATA ---
+  Region: prod
+  Run Date: 20251009
+  Run Time: 1009
+  Retest: False
+  Report File Name: prod-20251009-1009
+  Valid Run: True
+  Duration: 9m15.076s
+  Scenarios: 8 total, 6 passed, 2 failed
+  Steps: 104 total, 98 passed, 2 failed
+
+--- FEATURES (1) ---
+
+  Feature 1:
+    Name: Payment functionality should work correctly
+    Scenarios: 8
+
+    Scenario 1:
+      ID: scenario_1
+      Name: Verify Got Letter login with Single Debit Payment
+      Tag: @got_letter_single_debit
+      Status: passed
+      File: features/payment.feature:11
+      Steps: 13
+        Step 1:
+          Name: And I click on the Got Our Letter button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:11
+        Step 2:
+          Name: And I enter the reference number and password
+          Status: passed
+          File: features/step_definitions/login_steps.rb:23
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Make a Payment button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:6
+        Step 5:
+          Name: Then the payment page to make a payment should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:1
+        Step 6:
+          Name: And I enter in the payment amount and click continue
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:13
+        Step 7:
+          Name: Then I confirm affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:46
+        Step 8:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 9:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+        Step 10:
+          Name: And I click on the Pay Now button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:85
+        Step 11:
+          Name: Then the Barclay Card Payment page should load correctly
+          Status: passed
+          File: features/step_definitions/barclaycard_steps.rb:1
+        Step 12:
+          Name: And I click on the Barclay Card Payment Cancel button
+          Status: passed
+          File: features/step_definitions/barclaycard_steps.rb:6
+        Step 13:
+          Name: Then the Payment Response page should load correctly
+          Status: passed
+          File: features/step_definitions/paymentresponse_steps.rb:1
+
+    Scenario 2:
+      ID: scenario_2
+      Name: Verify Got Letter login with Single Bank Payment
+      Tag: @got_letter_single_bank
+      Status: passed
+      File: features/payment.feature:27
+      Steps: 11
+        Step 1:
+          Name: And I click on the Got Our Letter button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:11
+        Step 2:
+          Name: And I enter the reference number and password
+          Status: passed
+          File: features/step_definitions/login_steps.rb:23
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Make a Payment button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:6
+        Step 5:
+          Name: Then the payment page to make a payment should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:1
+        Step 6:
+          Name: And I enter in the payment amount and click continue
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:13
+        Step 7:
+          Name: Then I confirm affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:46
+        Step 8:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 9:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+        Step 10:
+          Name: And I expand on the Bank Payment option and click on the PayIt button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:89
+        Step 11:
+          Name: Then the PayIt page should load correctly
+          Status: passed
+          File: features/step_definitions/payit_steps.rb:1
+
+    Scenario 3:
+      ID: scenario_3
+      Name: Verify Got Letter login with Debit Payment Plan - Do Not Clear Balance
+      Tag: @got_letter_plan_debit_no_clear_bal
+      Status: failed
+      File: features/payment.feature:41
+      Steps: 12
+        Step 1:
+          Name: And I click on the Got Our Letter button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:11
+        Step 2:
+          Name: And I enter the reference number and password
+          Status: passed
+          File: features/step_definitions/login_steps.rb:23
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Set Up a Payment Plan button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:10
+        Step 5:
+          Name: Then the payment page to set up a plan should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:7
+        Step 6:
+          Name: And set the clear balance to No and click on the plan Confirm button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:18
+        Step 7:
+          Name: Then I set up a plan for Debit Card and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:28
+        Step 8:
+          Name: And I confirm plan affordability select source of funds and click confirm
+          Status: failed
+          File: features/step_definitions/payment_steps.rb:54
+        Step 9:
+          Name: Then I agree to the Continuous Payment Authority
+          Status: skipped
+          File: features/step_definitions/payment_steps.rb:67
+        Step 10:
+          Name: And I enter the billing and address info
+          Status: skipped
+          File: features/step_definitions/payment_steps.rb:73
+        Step 11:
+          Name: And I enter in the Debit Card info
+          Status: skipped
+          File: features/step_definitions/payment_steps.rb:79
+        Step 12:
+          Name: Then the Payment Summary should appear
+          Status: skipped
+          File: features/step_definitions/payment_steps.rb:63
+
+    Scenario 4:
+      ID: scenario_4
+      Name: Verify Got Letter login with Debit Payment Plan - Clear Balance
+      Tag: @got_letter_plan_debit_clear_bal
+      Status: passed
+      File: features/payment.feature:56
+      Steps: 12
+        Step 1:
+          Name: And I click on the Got Our Letter button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:11
+        Step 2:
+          Name: And I enter the reference number and password
+          Status: passed
+          File: features/step_definitions/login_steps.rb:23
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Set Up a Payment Plan button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:10
+        Step 5:
+          Name: Then the payment page to set up a plan should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:7
+        Step 6:
+          Name: And set the clear balance to Yes and click on the plan Confirm button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:23
+        Step 7:
+          Name: Then I set up a plan for Debit Card and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:28
+        Step 8:
+          Name: And I confirm plan affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:54
+        Step 9:
+          Name: Then I agree to the Continuous Payment Authority
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:67
+        Step 10:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 11:
+          Name: And I enter in the Debit Card info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:79
+        Step 12:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+
+    Scenario 5:
+      ID: scenario_5
+      Name: Verify User Information login with Single Debit Payment
+      Tag: @use_info_single_debit
+      Status: passed
+      File: features/payment.feature:72
+      Steps: 13
+        Step 1:
+          Name: And I click on the Use Your Information button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:15
+        Step 2:
+          Name: And I enter the users information
+          Status: passed
+          File: features/step_definitions/login_steps.rb:30
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Make a Payment button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:6
+        Step 5:
+          Name: Then the payment page to make a payment should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:1
+        Step 6:
+          Name: And I enter in the payment amount and click continue
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:13
+        Step 7:
+          Name: Then I confirm affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:46
+        Step 8:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 9:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+        Step 10:
+          Name: And I click on the Pay Now button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:85
+        Step 11:
+          Name: Then the Barclay Card Payment page should load correctly
+          Status: passed
+          File: features/step_definitions/barclaycard_steps.rb:1
+        Step 12:
+          Name: And I click on the Barclay Card Payment Cancel button
+          Status: passed
+          File: features/step_definitions/barclaycard_steps.rb:6
+        Step 13:
+          Name: Then the Payment Response page should load correctly
+          Status: passed
+          File: features/step_definitions/paymentresponse_steps.rb:1
+
+    Scenario 6:
+      ID: scenario_6
+      Name: Verify User Information login Single Bank Payment
+      Tag: @use_info_single_bank
+      Status: passed
+      File: features/payment.feature:88
+      Steps: 11
+        Step 1:
+          Name: And I click on the Use Your Information button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:15
+        Step 2:
+          Name: And I enter the users information
+          Status: passed
+          File: features/step_definitions/login_steps.rb:30
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Make a Payment button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:6
+        Step 5:
+          Name: Then the payment page to make a payment should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:1
+        Step 6:
+          Name: And I enter in the payment amount and click continue
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:13
+        Step 7:
+          Name: Then I confirm affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:46
+        Step 8:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 9:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+        Step 10:
+          Name: And I expand on the Bank Payment option and click on the PayIt button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:89
+        Step 11:
+          Name: Then the PayIt page should load correctly
+          Status: passed
+          File: features/step_definitions/payit_steps.rb:1
+
+    Scenario 7:
+      ID: scenario_7
+      Name: Verify User Information login Debit Payment Plan - Do Not Clear Balance
+      Tag: @use_info_plan_debit_no_clear_bal
+      Status: passed
+      File: features/payment.feature:102
+      Steps: 12
+        Step 1:
+          Name: And I click on the Use Your Information button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:15
+        Step 2:
+          Name: And I enter the users information
+          Status: passed
+          File: features/step_definitions/login_steps.rb:30
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Set Up a Payment Plan button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:10
+        Step 5:
+          Name: Then the payment page to set up a plan should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:7
+        Step 6:
+          Name: And set the clear balance to No and click on the plan Confirm button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:18
+        Step 7:
+          Name: Then I set up a plan for Debit Card and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:28
+        Step 8:
+          Name: And I confirm plan affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:54
+        Step 9:
+          Name: Then I agree to the Continuous Payment Authority
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:67
+        Step 10:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 11:
+          Name: And I enter in the Debit Card info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:79
+        Step 12:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+
+    Scenario 8:
+      ID: scenario_8
+      Name: Verify User Information login Debit Payment Plan - Clear Balance
+      Tag: @use_info_plan_debit_clear_bal
+      Status: failed
+      File: features/payment.feature:117
+      Steps: 12
+        Step 1:
+          Name: And I click on the Use Your Information button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:15
+        Step 2:
+          Name: And I enter the users information
+          Status: passed
+          File: features/step_definitions/login_steps.rb:30
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Set Up a Payment Plan button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:10
+        Step 5:
+          Name: Then the payment page to set up a plan should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:7
+        Step 6:
+          Name: And set the clear balance to Yes and click on the plan Confirm button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:23
+        Step 7:
+          Name: Then I set up a plan for Debit Card and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:28
+        Step 8:
+          Name: And I confirm plan affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:54
+        Step 9:
+          Name: Then I agree to the Continuous Payment Authority
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:67
+        Step 10:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 11:
+          Name: And I enter in the Debit Card info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:79
+        Step 12:
+          Name: Then the Payment Summary should appear
+          Status: failed
+          File: features/step_definitions/payment_steps.rb:63
+
+============================================================
+=== RETEST REPORT ===
+============================================================
+
+--- RUN DATA ---
+  Region: prod
+  Run Date: 20251009
+  Run Time: 1009
+  Retest: True
+  Report File Name: prod-20251009-1009(retest)
+  Valid Run: True
+  Duration: 2m41.172s
+  Scenarios: 2 total, 1 passed, 1 failed
+  Steps: 26 total, 24 passed, 1 failed
+
+--- FEATURES (1) ---
+
+  Feature 1:
+    Name: Payment functionality should work correctly
+    Scenarios: 2
+
+    Scenario 1:
+      ID: scenario_1
+      Name: Verify Got Letter login with Debit Payment Plan - Do Not Clear Balance
+      Tag: @got_letter_plan_debit_no_clear_bal
+      Status: passed
+      File: features/payment.feature:41
+      Steps: 12
+        Step 1:
+          Name: And I click on the Got Our Letter button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:11
+        Step 2:
+          Name: And I enter the reference number and password
+          Status: passed
+          File: features/step_definitions/login_steps.rb:23
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Set Up a Payment Plan button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:10
+        Step 5:
+          Name: Then the payment page to set up a plan should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:7
+        Step 6:
+          Name: And set the clear balance to No and click on the plan Confirm button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:18
+        Step 7:
+          Name: Then I set up a plan for Debit Card and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:28
+        Step 8:
+          Name: And I confirm plan affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:54
+        Step 9:
+          Name: Then I agree to the Continuous Payment Authority
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:67
+        Step 10:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 11:
+          Name: And I enter in the Debit Card info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:79
+        Step 12:
+          Name: Then the Payment Summary should appear
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:63
+
+    Scenario 2:
+      ID: scenario_2
+      Name: Verify User Information login Debit Payment Plan - Clear Balance
+      Tag: @use_info_plan_debit_clear_bal
+      Status: failed
+      File: features/payment.feature:117
+      Steps: 12
+        Step 1:
+          Name: And I click on the Use Your Information button
+          Status: passed
+          File: features/step_definitions/login_steps.rb:15
+        Step 2:
+          Name: And I enter the users information
+          Status: passed
+          File: features/step_definitions/login_steps.rb:30
+        Step 3:
+          Name: Then the accounts page should load correctly
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:1
+        Step 4:
+          Name: And I click on the Set Up a Payment Plan button
+          Status: passed
+          File: features/step_definitions/accounts_steps.rb:10
+        Step 5:
+          Name: Then the payment page to set up a plan should load correctly
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:7
+        Step 6:
+          Name: And set the clear balance to Yes and click on the plan Confirm button
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:23
+        Step 7:
+          Name: Then I set up a plan for Debit Card and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:28
+        Step 8:
+          Name: And I confirm plan affordability select source of funds and click confirm
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:54
+        Step 9:
+          Name: Then I agree to the Continuous Payment Authority
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:67
+        Step 10:
+          Name: And I enter the billing and address info
+          Status: passed
+          File: features/step_definitions/payment_steps.rb:73
+        Step 11:
+          Name: And I enter in the Debit Card info
+          Status: failed
+          File: features/step_definitions/payment_steps.rb:79
+        Step 12:
+          Name: Then the Payment Summary should appear
+          Status: skipped
+          File: features/step_definitions/payment_steps.rb:63
+

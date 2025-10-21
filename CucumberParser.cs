@@ -54,13 +54,13 @@ namespace CucumberParser
     // Class to hold step-level data
     public class Step
     {
-        public string StepName { get; set; }
-        public string StepStatus { get; set; }
-        public string StepFile { get; set; }
+        public string? StepName { get; set; }
+        public string? StepStatus { get; set; }
+        public string? StepFile { get; set; }
 
-        public Dictionary<string, object> ToDict()
+        public Dictionary<string, object?> ToDict()
         {
-            return new Dictionary<string, object>
+            return new Dictionary<string, object?>
             {
                 { "step_name", StepName },
                 { "step_status", StepStatus },
@@ -72,11 +72,11 @@ namespace CucumberParser
     // Class to hold scenario-level data
     public class Scenario
     {
-        public string ScenarioIdNum { get; set; }
-        public string ScenarioName { get; set; }
-        public string ScenarioStatus { get; set; }
-        public string ScenarioFile { get; set; }
-        public string ScenarioTag { get; set; }
+        public string? ScenarioIdNum { get; set; }
+        public string? ScenarioName { get; set; }
+        public string? ScenarioStatus { get; set; }
+        public string? ScenarioFile { get; set; }
+        public string? ScenarioTag { get; set; }
         public List<Step> Steps { get; set; } = new List<Step>();
 
         public void AddStep(Step step)
@@ -101,9 +101,9 @@ namespace CucumberParser
             ScenarioStatus = "passed";
         }
 
-        public Dictionary<string, object> ToDict()
+        public Dictionary<string, object?> ToDict()
         {
-            return new Dictionary<string, object>
+            return new Dictionary<string, object?>
             {
                 { "scenario_id_num", ScenarioIdNum },
                 { "scenario_name", ScenarioName },
@@ -118,7 +118,7 @@ namespace CucumberParser
     // Class to hold feature-level data
     public class Feature
     {
-        public string FeatureName { get; set; }
+        public string? FeatureName { get; set; }
         public List<Scenario> Scenarios { get; set; } = new List<Scenario>();
 
         public void AddScenario(Scenario scenario)
@@ -126,9 +126,9 @@ namespace CucumberParser
             Scenarios.Add(scenario);
         }
 
-        public Dictionary<string, object> ToDict()
+        public Dictionary<string, object?> ToDict()
         {
-            return new Dictionary<string, object>
+            return new Dictionary<string, object?>
             {
                 { "feature_name", FeatureName },
                 { "scenarios", Scenarios.Select(s => s.ToDict()).ToList() }
@@ -139,13 +139,13 @@ namespace CucumberParser
     // Class to hold parsed Cucumber report data with hierarchical structure
     public class CucumberReport
     {
-        public string Region { get; set; }
-        public string RunDate { get; set; }
-        public string RunTime { get; set; }
+        public string? Region { get; set; }
+        public string? RunDate { get; set; }
+        public string? RunTime { get; set; }
         public bool Retest { get; set; }
-        public string ReportFileName { get; set; }
+        public string? ReportFileName { get; set; }
         public bool ValidRun { get; set; } = true;
-        public string Duration { get; set; }
+        public string? Duration { get; set; }
         public int ScenariosTotal { get; set; }
         public int ScenariosPassed { get; set; }
         public int ScenariosFailed { get; set; }
@@ -159,9 +159,9 @@ namespace CucumberParser
             Features.Add(feature);
         }
 
-        public Dictionary<string, object> ToDict()
+        public Dictionary<string, object?> ToDict()
         {
-            var run = new Dictionary<string, object>
+            var run = new Dictionary<string, object?>
             {
                 { "region", Region },
                 { "run_date", RunDate },
@@ -178,7 +178,7 @@ namespace CucumberParser
                 { "steps_failed", StepsFailed }
             };
 
-            return new Dictionary<string, object>
+            return new Dictionary<string, object?>
             {
                 { "run", run },
                 { "features", Features.Select(f => f.ToDict()).ToList() }
@@ -427,7 +427,7 @@ namespace CucumberParser
             return scenario;
         }
 
-        private Step ParseStep(HtmlNode stepLi)
+        private Step? ParseStep(HtmlNode stepLi)
         {
             var step = new Step();
 
@@ -484,7 +484,7 @@ namespace CucumberParser
             return parser.Report;
         }
 
-        public static Dictionary<string, object> ParseFilenameMetadata(string filepath)
+        public static Dictionary<string, object?> ParseFilenameMetadata(string filepath)
         {
             // Get just the filename without path
             var filename = Path.GetFileName(filepath);
@@ -501,7 +501,7 @@ namespace CucumberParser
             // Parse the pattern: region-YYYYDDMM-HHmm
             var parts = basenameForParsing.Split('-');
 
-            var metadata = new Dictionary<string, object>
+            var metadata = new Dictionary<string, object?>
             {
                 { "region", null },
                 { "run_date", null },
@@ -531,7 +531,7 @@ namespace CucumberParser
                 report.Region = metadata["region"]?.ToString();
                 report.RunDate = metadata["run_date"]?.ToString();
                 report.RunTime = metadata["run_time"]?.ToString();
-                report.Retest = (bool)metadata["retest"];
+                report.Retest = metadata["retest"] as bool? ?? false;
                 report.ReportFileName = metadata["report_file_name"]?.ToString();
             }
             catch (Exception e)
@@ -602,7 +602,7 @@ namespace CucumberParser
             return report;
         }
 
-        public static (string baseFile, string retestFile) FindRelatedFiles(string basename, string searchPath = null)
+        public static (string? baseFile, string? retestFile) FindRelatedFiles(string basename, string? searchPath = null)
         {
             // Remove .htm extension if present
             if (basename.EndsWith(".htm"))
@@ -627,7 +627,7 @@ namespace CucumberParser
         }
 
         // Convenience functions for direct field access
-        public static string GetDuration(string htmlContent)
+        public static string? GetDuration(string htmlContent)
         {
             return ParseCucumberHtml(htmlContent).Duration;
         }
@@ -729,7 +729,7 @@ namespace CucumberParser
             }
 
             // Determine search directory
-            string searchDir;
+            string? searchDir;
             if (!string.IsNullOrEmpty(customDir))
             {
                 searchDir = customDir;
@@ -847,10 +847,10 @@ Examples:
                 if (fields.Count > 0)
                 {
                     // Output specific fields for each report
-                    var output = new Dictionary<string, Dictionary<string, object>>();
+                    var output = new Dictionary<string, Dictionary<string, object?>>();
                     foreach (var kvp in reports)
                     {
-                        var fieldData = new Dictionary<string, object>();
+                        var fieldData = new Dictionary<string, object?>();
                         foreach (var field in fields)
                         {
                             fieldData[field] = GetFieldValue(kvp.Value, field);
@@ -862,7 +862,7 @@ Examples:
                 else
                 {
                     // Output all fields for each report
-                    var output = new Dictionary<string, Dictionary<string, object>>();
+                    var output = new Dictionary<string, Dictionary<string, object?>>();
                     foreach (var kvp in reports)
                     {
                         output[kvp.Key] = kvp.Value.ToDict();
@@ -962,7 +962,7 @@ Examples:
             }
         }
 
-        static object GetFieldValue(CucumberReport report, string field)
+        static object? GetFieldValue(CucumberReport report, string field)
         {
             return field switch
             {

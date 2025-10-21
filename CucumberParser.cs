@@ -51,6 +51,69 @@ namespace CucumberParser
         }
     }
 
+    // Constants for parsing and status values
+    public static class ParsingConstants
+    {
+        // Status values
+        public const string STATUS_PASSED = "passed";
+        public const string STATUS_FAILED = "failed";
+        public const string STATUS_SKIPPED = "skipped";
+        public const string STATUS_PENDING = "pending";
+        public const string STATUS_UNDEFINED = "undefined";
+
+        public static readonly string[] VALID_STATUSES = new[]
+        {
+            STATUS_PASSED, STATUS_FAILED, STATUS_SKIPPED, STATUS_PENDING, STATUS_UNDEFINED
+        };
+
+        // HTML element IDs and selectors
+        public const string XPATH_FEATURE_DIVS = "//div[contains(@class, 'feature')]";
+        public const string XPATH_SCENARIO_DIVS = ".//div[contains(@class, 'scenario')]";
+        public const string XPATH_FEATURE_NAME = ".//h2//span[@class='val']";
+        public const string XPATH_SCENARIO_FILE = ".//span[@class='scenario_file']";
+        public const string XPATH_SCENARIO_TAG = ".//span[@class='tag']";
+        public const string XPATH_SCENARIO_H3 = ".//h3[starts-with(@id, 'scenario_')]";
+        public const string XPATH_SCENARIO_NAME = ".//span[@class='val']";
+        public const string XPATH_STEP_LIS = ".//li[contains(@class, 'step')]";
+        public const string XPATH_STEP_NAME_DIV = ".//div[@class='step_name']";
+        public const string XPATH_STEP_KEYWORD = ".//span[contains(@class, 'keyword')]";
+        public const string XPATH_STEP_VAL = ".//span[contains(@class, 'val')]";
+        public const string XPATH_STEP_FILE = ".//div[@class='step_file']//span";
+        public const string XPATH_SCRIPT_TAGS = "//script";
+        public const string XPATH_DURATION_P = "//p[@id='duration']";
+        public const string XPATH_TOTALS_P = "//p[@id='totals']";
+        public const string XPATH_DURATION_STRONG = ".//strong";
+
+        // Regex patterns
+        public const string REGEX_GET_ELEMENT_BY_ID = @"getElementById\(['""]({0})['""]\)\.innerHTML\s*=\s*['""]([^'""]+)['""]";
+        public const string REGEX_SCENARIOS = @"(\d+)\s+scenarios?\s*\((.*?)\)";
+        public const string REGEX_STEPS = @"(\d+)\s+steps?\s*\((.*?)\)";
+        public const string REGEX_FAILED_COUNT = @"(\d+)\s+failed";
+        public const string REGEX_PASSED_COUNT = @"(\d+)\s+passed";
+        public const string REGEX_STRONG_TAG = @"<strong>([^<]+)</strong>";
+
+        // Prefixes to remove
+        public const string PREFIX_FEATURE = "Feature:";
+        public const string PREFIX_SCENARIO_OUTLINE = "Scenario Outline:";
+        public const string PREFIX_SCENARIO = "Scenario:";
+
+        // HTML element IDs
+        public const string ELEMENT_ID_TOTALS = "totals";
+        public const string ELEMENT_ID_DURATION = "duration";
+
+        // File extension
+        public const string FILE_EXTENSION_HTM = ".htm";
+        public const string FILE_SUFFIX_RETEST = "(retest)";
+
+        // HTML tag replacements
+        public const string HTML_BR = "<br>";
+        public const string HTML_BR_SLASH = "<br />";
+        public const string NEWLINE = "\n";
+
+        // Duration suffix
+        public const string DURATION_SUFFIX = " seconds";
+    }
+
     // Class to hold step-level data
     public class Step
     {
@@ -90,15 +153,15 @@ namespace CucumberParser
             foreach (var step in Steps)
             {
                 if (!string.IsNullOrEmpty(step.StepStatus) &&
-                    (step.StepStatus.ToLower().Contains("failed") ||
-                     step.StepStatus.ToLower().Contains("skipped")))
+                    (step.StepStatus.ToLower().Contains(ParsingConstants.STATUS_FAILED) ||
+                     step.StepStatus.ToLower().Contains(ParsingConstants.STATUS_SKIPPED)))
                 {
-                    ScenarioStatus = "failed";
+                    ScenarioStatus = ParsingConstants.STATUS_FAILED;
                     return;
                 }
             }
             // All steps passed
-            ScenarioStatus = "passed";
+            ScenarioStatus = ParsingConstants.STATUS_PASSED;
         }
 
         public Dictionary<string, object?> ToDict()
@@ -213,7 +276,7 @@ namespace CucumberParser
             ParseScriptTags(doc);
 
             // Parse features
-            var featureDivs = doc.DocumentNode.SelectNodes("//div[contains(@class, 'feature')]");
+            var featureDivs = doc.DocumentNode.SelectNodes(ParsingConstants.XPATH_FEATURE_DIVS);
             if (featureDivs != null)
             {
                 foreach (var featureDiv in featureDivs)
@@ -229,7 +292,7 @@ namespace CucumberParser
 
         private void ParseScriptTags(HtmlDocument doc)
         {
-            var scriptNodes = doc.DocumentNode.SelectNodes("//script");
+            var scriptNodes = doc.DocumentNode.SelectNodes(ParsingConstants.XPATH_SCRIPT_TAGS);
             if (scriptNodes != null)
             {
                 foreach (var scriptNode in scriptNodes)
@@ -237,27 +300,29 @@ namespace CucumberParser
                     var scriptContent = scriptNode.InnerText;
 
                     // Look for: document.getElementById('totals').innerHTML = "..."
-                    var totalsMatch = Regex.Match(scriptContent, @"getElementById\(['""]totals['""]\)\.innerHTML\s*=\s*['""]([^'""]+)['""]");
+                    var totalsPattern = string.Format(ParsingConstants.REGEX_GET_ELEMENT_BY_ID, ParsingConstants.ELEMENT_ID_TOTALS);
+                    var totalsMatch = Regex.Match(scriptContent, totalsPattern);
                     if (totalsMatch.Success)
                     {
-                        var totalsText = totalsMatch.Groups[1].Value
-                            .Replace("<br />", "\n")
-                            .Replace("<br>", "\n");
+                        var totalsText = totalsMatch.Groups[2].Value
+                            .Replace(ParsingConstants.HTML_BR_SLASH, ParsingConstants.NEWLINE)
+                            .Replace(ParsingConstants.HTML_BR, ParsingConstants.NEWLINE);
                         ParseTotalsText(totalsText);
                     }
 
                     // Look for: document.getElementById('duration').innerHTML = "..."
-                    var durationMatch = Regex.Match(scriptContent, @"getElementById\(['""]duration['""]\)\.innerHTML\s*=\s*['""]([^'""]+)['""]");
+                    var durationPattern = string.Format(ParsingConstants.REGEX_GET_ELEMENT_BY_ID, ParsingConstants.ELEMENT_ID_DURATION);
+                    var durationMatch = Regex.Match(scriptContent, durationPattern);
                     if (durationMatch.Success)
                     {
-                        var durationHtml = durationMatch.Groups[1].Value;
+                        var durationHtml = durationMatch.Groups[2].Value;
                         // Extract text from <strong> tags
-                        var strongMatch = Regex.Match(durationHtml, @"<strong>([^<]+)</strong>");
+                        var strongMatch = Regex.Match(durationHtml, ParsingConstants.REGEX_STRONG_TAG);
                         if (strongMatch.Success)
                         {
                             var durationText = strongMatch.Groups[1].Value.Trim();
                             // Remove 'seconds' suffix if present
-                            Report.Duration = durationText.Replace(" seconds", "").Trim();
+                            Report.Duration = durationText.Replace(ParsingConstants.DURATION_SUFFIX, "").Trim();
                         }
                     }
                 }
@@ -266,10 +331,10 @@ namespace CucumberParser
             // Fallback: try parsing from p tags if script parsing didn't work
             if (string.IsNullOrEmpty(Report.Duration))
             {
-                var durationNode = doc.DocumentNode.SelectSingleNode("//p[@id='duration']");
+                var durationNode = doc.DocumentNode.SelectSingleNode(ParsingConstants.XPATH_DURATION_P);
                 if (durationNode != null)
                 {
-                    var strongNode = durationNode.SelectSingleNode(".//strong");
+                    var strongNode = durationNode.SelectSingleNode(ParsingConstants.XPATH_DURATION_STRONG);
                     if (strongNode != null)
                     {
                         Report.Duration = strongNode.InnerText.Trim();
@@ -279,7 +344,7 @@ namespace CucumberParser
 
             if (Report.ScenariosTotal == 0)
             {
-                var totalsNode = doc.DocumentNode.SelectSingleNode("//p[@id='totals']");
+                var totalsNode = doc.DocumentNode.SelectSingleNode(ParsingConstants.XPATH_TOTALS_P);
                 if (totalsNode != null)
                 {
                     ParseTotalsText(totalsNode.InnerText);
@@ -290,21 +355,21 @@ namespace CucumberParser
         private void ParseTotalsText(string totalsText)
         {
             // Parse scenarios: "1 scenario (1 passed)"
-            var scenarioMatch = Regex.Match(totalsText, @"(\d+)\s+scenarios?\s*\((.*?)\)", RegexOptions.IgnoreCase);
+            var scenarioMatch = Regex.Match(totalsText, ParsingConstants.REGEX_SCENARIOS, RegexOptions.IgnoreCase);
             if (scenarioMatch.Success)
             {
                 Report.ScenariosTotal = int.Parse(scenarioMatch.Groups[1].Value);
                 var scenarioDetails = scenarioMatch.Groups[2].Value;
 
                 // Extract failed scenarios
-                var failedMatch = Regex.Match(scenarioDetails, @"(\d+)\s+failed");
+                var failedMatch = Regex.Match(scenarioDetails, ParsingConstants.REGEX_FAILED_COUNT);
                 if (failedMatch.Success)
                 {
                     Report.ScenariosFailed = int.Parse(failedMatch.Groups[1].Value);
                 }
 
                 // Extract passed scenarios
-                var passedMatch = Regex.Match(scenarioDetails, @"(\d+)\s+passed");
+                var passedMatch = Regex.Match(scenarioDetails, ParsingConstants.REGEX_PASSED_COUNT);
                 if (passedMatch.Success)
                 {
                     Report.ScenariosPassed = int.Parse(passedMatch.Groups[1].Value);
@@ -312,21 +377,21 @@ namespace CucumberParser
             }
 
             // Parse steps: "4 steps (4 passed)"
-            var stepMatch = Regex.Match(totalsText, @"(\d+)\s+steps?\s*\((.*?)\)", RegexOptions.IgnoreCase);
+            var stepMatch = Regex.Match(totalsText, ParsingConstants.REGEX_STEPS, RegexOptions.IgnoreCase);
             if (stepMatch.Success)
             {
                 Report.StepsTotal = int.Parse(stepMatch.Groups[1].Value);
                 var stepDetails = stepMatch.Groups[2].Value;
 
                 // Extract failed steps
-                var failedMatch = Regex.Match(stepDetails, @"(\d+)\s+failed");
+                var failedMatch = Regex.Match(stepDetails, ParsingConstants.REGEX_FAILED_COUNT);
                 if (failedMatch.Success)
                 {
                     Report.StepsFailed = int.Parse(failedMatch.Groups[1].Value);
                 }
 
                 // Extract passed steps
-                var passedMatch = Regex.Match(stepDetails, @"(\d+)\s+passed");
+                var passedMatch = Regex.Match(stepDetails, ParsingConstants.REGEX_PASSED_COUNT);
                 if (passedMatch.Success)
                 {
                     Report.StepsPassed = int.Parse(passedMatch.Groups[1].Value);
@@ -339,20 +404,20 @@ namespace CucumberParser
             var feature = new Feature();
 
             // Get feature name from h2 > span.val
-            var featureNameNode = featureDiv.SelectSingleNode(".//h2//span[@class='val']");
+            var featureNameNode = featureDiv.SelectSingleNode(ParsingConstants.XPATH_FEATURE_NAME);
             if (featureNameNode != null)
             {
                 var featureName = featureNameNode.InnerText.Trim();
                 // Remove "Feature: " prefix if present
-                if (featureName.StartsWith("Feature:"))
+                if (featureName.StartsWith(ParsingConstants.PREFIX_FEATURE))
                 {
-                    featureName = featureName.Substring(8).Trim();
+                    featureName = featureName.Substring(ParsingConstants.PREFIX_FEATURE.Length).Trim();
                 }
                 feature.FeatureName = featureName;
             }
 
             // Parse scenarios
-            var scenarioDivs = featureDiv.SelectNodes(".//div[contains(@class, 'scenario')]");
+            var scenarioDivs = featureDiv.SelectNodes(ParsingConstants.XPATH_SCENARIO_DIVS);
             if (scenarioDivs != null)
             {
                 foreach (var scenarioDiv in scenarioDivs)
@@ -374,44 +439,44 @@ namespace CucumberParser
             var scenario = new Scenario();
 
             // Get scenario file from span.scenario_file (before h3)
-            var scenarioFileNode = scenarioDiv.SelectSingleNode(".//span[@class='scenario_file']");
+            var scenarioFileNode = scenarioDiv.SelectSingleNode(ParsingConstants.XPATH_SCENARIO_FILE);
             if (scenarioFileNode != null)
             {
                 scenario.ScenarioFile = scenarioFileNode.InnerText.Trim();
             }
 
             // Get scenario tag from span.tag
-            var scenarioTagNode = scenarioDiv.SelectSingleNode(".//span[@class='tag']");
+            var scenarioTagNode = scenarioDiv.SelectSingleNode(ParsingConstants.XPATH_SCENARIO_TAG);
             if (scenarioTagNode != null)
             {
                 scenario.ScenarioTag = scenarioTagNode.InnerText.Trim();
             }
 
             // Get scenario ID and name from h3
-            var h3Node = scenarioDiv.SelectSingleNode(".//h3[starts-with(@id, 'scenario_')]");
+            var h3Node = scenarioDiv.SelectSingleNode(ParsingConstants.XPATH_SCENARIO_H3);
             if (h3Node != null)
             {
                 scenario.ScenarioIdNum = h3Node.GetAttributeValue("id", null);
 
-                var scenarioNameNode = h3Node.SelectSingleNode(".//span[@class='val']");
+                var scenarioNameNode = h3Node.SelectSingleNode(ParsingConstants.XPATH_SCENARIO_NAME);
                 if (scenarioNameNode != null)
                 {
                     var scenarioName = scenarioNameNode.InnerText.Trim();
                     // Remove "Scenario:" or "Scenario Outline:" prefix if present
-                    if (scenarioName.StartsWith("Scenario Outline:"))
+                    if (scenarioName.StartsWith(ParsingConstants.PREFIX_SCENARIO_OUTLINE))
                     {
-                        scenarioName = scenarioName.Substring(17).Trim();
+                        scenarioName = scenarioName.Substring(ParsingConstants.PREFIX_SCENARIO_OUTLINE.Length).Trim();
                     }
-                    else if (scenarioName.StartsWith("Scenario:"))
+                    else if (scenarioName.StartsWith(ParsingConstants.PREFIX_SCENARIO))
                     {
-                        scenarioName = scenarioName.Substring(9).Trim();
+                        scenarioName = scenarioName.Substring(ParsingConstants.PREFIX_SCENARIO.Length).Trim();
                     }
                     scenario.ScenarioName = scenarioName;
                 }
             }
 
             // Parse steps
-            var stepLis = scenarioDiv.SelectNodes(".//li[contains(@class, 'step')]");
+            var stepLis = scenarioDiv.SelectNodes(ParsingConstants.XPATH_STEP_LIS);
             if (stepLis != null)
             {
                 foreach (var stepLi in stepLis)
@@ -433,8 +498,7 @@ namespace CucumberParser
 
             // Get step status from class attribute
             var classes = stepLi.GetAttributeValue("class", "").Split(' ');
-            var validStatuses = new[] { "passed", "failed", "skipped", "pending", "undefined" };
-            var status = classes.FirstOrDefault(c => validStatuses.Contains(c));
+            var status = classes.FirstOrDefault(c => ParsingConstants.VALID_STATUSES.Contains(c));
 
             if (status == null)
             {
@@ -444,11 +508,11 @@ namespace CucumberParser
             step.StepStatus = status;
 
             // Get step name from div.step_name
-            var stepNameDiv = stepLi.SelectSingleNode(".//div[@class='step_name']");
+            var stepNameDiv = stepLi.SelectSingleNode(ParsingConstants.XPATH_STEP_NAME_DIV);
             if (stepNameDiv != null)
             {
-                var keywordNode = stepNameDiv.SelectSingleNode(".//span[contains(@class, 'keyword')]");
-                var valNode = stepNameDiv.SelectSingleNode(".//span[contains(@class, 'val')]");
+                var keywordNode = stepNameDiv.SelectSingleNode(ParsingConstants.XPATH_STEP_KEYWORD);
+                var valNode = stepNameDiv.SelectSingleNode(ParsingConstants.XPATH_STEP_VAL);
 
                 var keyword = keywordNode?.InnerText.Trim() ?? "";
                 var val = valNode?.InnerText.Trim() ?? "";
@@ -464,7 +528,7 @@ namespace CucumberParser
             }
 
             // Get step file from div.step_file > span
-            var stepFileSpan = stepLi.SelectSingleNode(".//div[@class='step_file']//span");
+            var stepFileSpan = stepLi.SelectSingleNode(ParsingConstants.XPATH_STEP_FILE);
             if (stepFileSpan != null)
             {
                 step.StepFile = stepFileSpan.InnerText.Trim();
@@ -490,13 +554,13 @@ namespace CucumberParser
             var filename = Path.GetFileName(filepath);
 
             // Check if it's a retest file
-            var isRetest = filename.Contains("(retest)");
+            var isRetest = filename.Contains(ParsingConstants.FILE_SUFFIX_RETEST);
 
             // Remove .htm extension but keep (retest) for the report file name
-            var basename = filename.Replace(".htm", "");
+            var basename = filename.Replace(ParsingConstants.FILE_EXTENSION_HTM, "");
 
             // For parsing, remove (retest) temporarily
-            var basenameForParsing = basename.Replace("(retest)", "");
+            var basenameForParsing = basename.Replace(ParsingConstants.FILE_SUFFIX_RETEST, "");
 
             // Parse the pattern: region-YYYYDDMM-HHmm
             var parts = basenameForParsing.Split('-');
@@ -605,13 +669,13 @@ namespace CucumberParser
         public static (string? baseFile, string? retestFile) FindRelatedFiles(string basename, string? searchPath = null)
         {
             // Remove .htm extension if present
-            if (basename.EndsWith(".htm"))
+            if (basename.EndsWith(ParsingConstants.FILE_EXTENSION_HTM))
             {
-                basename = basename.Substring(0, basename.Length - 4);
+                basename = basename.Substring(0, basename.Length - ParsingConstants.FILE_EXTENSION_HTM.Length);
             }
 
-            var baseFile = $"{basename}.htm";
-            var retestFile = $"{basename}(retest).htm";
+            var baseFile = $"{basename}{ParsingConstants.FILE_EXTENSION_HTM}";
+            var retestFile = $"{basename}{ParsingConstants.FILE_SUFFIX_RETEST}{ParsingConstants.FILE_EXTENSION_HTM}";
 
             // If search_path provided, prepend it
             if (!string.IsNullOrEmpty(searchPath))

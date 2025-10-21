@@ -114,6 +114,58 @@ namespace CucumberParser
         public const string DURATION_SUFFIX = " seconds";
     }
 
+    // Helper methods for common parsing operations
+    public static class ParsingHelpers
+    {
+        /// <summary>
+        /// Removes a prefix from a string if it exists
+        /// </summary>
+        public static string RemovePrefix(string text, string prefix)
+        {
+            if (text.StartsWith(prefix))
+            {
+                return text.Substring(prefix.Length).Trim();
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Extracts count from regex match group
+        /// </summary>
+        public static int ExtractCount(string text, string pattern)
+        {
+            var match = Regex.Match(text, pattern);
+            if (match.Success)
+            {
+                return int.Parse(match.Groups[1].Value);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Parses scenario or step statistics from detail text
+        /// </summary>
+        public static (int failed, int passed) ParseStatistics(string detailText)
+        {
+            int failed = 0;
+            int passed = 0;
+
+            var failedMatch = Regex.Match(detailText, ParsingConstants.REGEX_FAILED_COUNT);
+            if (failedMatch.Success)
+            {
+                failed = int.Parse(failedMatch.Groups[1].Value);
+            }
+
+            var passedMatch = Regex.Match(detailText, ParsingConstants.REGEX_PASSED_COUNT);
+            if (passedMatch.Success)
+            {
+                passed = int.Parse(passedMatch.Groups[1].Value);
+            }
+
+            return (failed, passed);
+        }
+    }
+
     // Class to hold step-level data
     public class Step
     {
@@ -360,20 +412,9 @@ namespace CucumberParser
             {
                 Report.ScenariosTotal = int.Parse(scenarioMatch.Groups[1].Value);
                 var scenarioDetails = scenarioMatch.Groups[2].Value;
-
-                // Extract failed scenarios
-                var failedMatch = Regex.Match(scenarioDetails, ParsingConstants.REGEX_FAILED_COUNT);
-                if (failedMatch.Success)
-                {
-                    Report.ScenariosFailed = int.Parse(failedMatch.Groups[1].Value);
-                }
-
-                // Extract passed scenarios
-                var passedMatch = Regex.Match(scenarioDetails, ParsingConstants.REGEX_PASSED_COUNT);
-                if (passedMatch.Success)
-                {
-                    Report.ScenariosPassed = int.Parse(passedMatch.Groups[1].Value);
-                }
+                var (failed, passed) = ParsingHelpers.ParseStatistics(scenarioDetails);
+                Report.ScenariosFailed = failed;
+                Report.ScenariosPassed = passed;
             }
 
             // Parse steps: "4 steps (4 passed)"
@@ -382,20 +423,9 @@ namespace CucumberParser
             {
                 Report.StepsTotal = int.Parse(stepMatch.Groups[1].Value);
                 var stepDetails = stepMatch.Groups[2].Value;
-
-                // Extract failed steps
-                var failedMatch = Regex.Match(stepDetails, ParsingConstants.REGEX_FAILED_COUNT);
-                if (failedMatch.Success)
-                {
-                    Report.StepsFailed = int.Parse(failedMatch.Groups[1].Value);
-                }
-
-                // Extract passed steps
-                var passedMatch = Regex.Match(stepDetails, ParsingConstants.REGEX_PASSED_COUNT);
-                if (passedMatch.Success)
-                {
-                    Report.StepsPassed = int.Parse(passedMatch.Groups[1].Value);
-                }
+                var (failed, passed) = ParsingHelpers.ParseStatistics(stepDetails);
+                Report.StepsFailed = failed;
+                Report.StepsPassed = passed;
             }
         }
 
@@ -408,12 +438,7 @@ namespace CucumberParser
             if (featureNameNode != null)
             {
                 var featureName = featureNameNode.InnerText.Trim();
-                // Remove "Feature: " prefix if present
-                if (featureName.StartsWith(ParsingConstants.PREFIX_FEATURE))
-                {
-                    featureName = featureName.Substring(ParsingConstants.PREFIX_FEATURE.Length).Trim();
-                }
-                feature.FeatureName = featureName;
+                feature.FeatureName = ParsingHelpers.RemovePrefix(featureName, ParsingConstants.PREFIX_FEATURE);
             }
 
             // Parse scenarios
@@ -463,14 +488,8 @@ namespace CucumberParser
                 {
                     var scenarioName = scenarioNameNode.InnerText.Trim();
                     // Remove "Scenario:" or "Scenario Outline:" prefix if present
-                    if (scenarioName.StartsWith(ParsingConstants.PREFIX_SCENARIO_OUTLINE))
-                    {
-                        scenarioName = scenarioName.Substring(ParsingConstants.PREFIX_SCENARIO_OUTLINE.Length).Trim();
-                    }
-                    else if (scenarioName.StartsWith(ParsingConstants.PREFIX_SCENARIO))
-                    {
-                        scenarioName = scenarioName.Substring(ParsingConstants.PREFIX_SCENARIO.Length).Trim();
-                    }
+                    scenarioName = ParsingHelpers.RemovePrefix(scenarioName, ParsingConstants.PREFIX_SCENARIO_OUTLINE);
+                    scenarioName = ParsingHelpers.RemovePrefix(scenarioName, ParsingConstants.PREFIX_SCENARIO);
                     scenario.ScenarioName = scenarioName;
                 }
             }

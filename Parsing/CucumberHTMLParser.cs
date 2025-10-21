@@ -7,7 +7,7 @@ using HtmlAgilityPack;
 namespace CucumberParser.Parsing
 {
     // HTML Parser for Cucumber test reports
-    public class CucumberHTMLParser
+    public class CucumberHTMLParser : IHtmlParser
     {
         public CucumberReport Report { get; private set; } = new CucumberReport();
 

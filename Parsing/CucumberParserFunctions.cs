@@ -9,9 +9,15 @@ namespace CucumberParser.Parsing
     // Parser functions
     public static class CucumberParserFunctions
     {
-        public static CucumberReport ParseCucumberHtml(string htmlContent)
+        /// <summary>
+        /// Parses Cucumber HTML content and returns a report.
+        /// </summary>
+        /// <param name="htmlContent">The HTML content to parse</param>
+        /// <param name="parser">Optional parser implementation (defaults to CucumberHTMLParser)</param>
+        /// <returns>Parsed CucumberReport</returns>
+        public static CucumberReport ParseCucumberHtml(string htmlContent, IHtmlParser? parser = null)
         {
-            var parser = new CucumberHTMLParser();
+            parser ??= new CucumberHTMLParser();
             parser.Feed(htmlContent);
             return parser.Report;
         }
@@ -52,8 +58,23 @@ namespace CucumberParser.Parsing
             return metadata;
         }
 
-        public static CucumberReport ParseCucumberHtmlFile(string filepath, bool debug = false)
+        /// <summary>
+        /// Parses a Cucumber HTML file and returns a report.
+        /// </summary>
+        /// <param name="filepath">Path to the HTML file</param>
+        /// <param name="debug">Enable debug logging</param>
+        /// <param name="fileReader">Optional file reader implementation (defaults to FileReader)</param>
+        /// <param name="parser">Optional parser implementation (defaults to CucumberHTMLParser)</param>
+        /// <returns>Parsed CucumberReport</returns>
+        public static CucumberReport ParseCucumberHtmlFile(
+            string filepath,
+            bool debug = false,
+            IFileReader? fileReader = null,
+            IHtmlParser? parser = null)
         {
+            fileReader ??= new FileReader();
+            parser ??= new CucumberHTMLParser();
+
             var report = new CucumberReport();
 
             // Add metadata from filename first
@@ -79,7 +100,7 @@ namespace CucumberParser.Parsing
             // Try to parse the HTML content
             try
             {
-                var htmlContent = File.ReadAllText(filepath);
+                var htmlContent = fileReader.ReadAllText(filepath);
 
                 if (debug)
                 {
@@ -92,7 +113,6 @@ namespace CucumberParser.Parsing
                     }
                 }
 
-                var parser = new CucumberHTMLParser();
                 parser.Feed(htmlContent);
                 var parsedReport = parser.Report;
 
@@ -134,8 +154,20 @@ namespace CucumberParser.Parsing
             return report;
         }
 
-        public static (string? baseFile, string? retestFile) FindRelatedFiles(string basename, string? searchPath = null)
+        /// <summary>
+        /// Finds related Cucumber HTML files (base and retest) for a given basename.
+        /// </summary>
+        /// <param name="basename">The base filename (with or without .htm extension)</param>
+        /// <param name="searchPath">Optional directory to search in</param>
+        /// <param name="fileReader">Optional file reader implementation (defaults to FileReader)</param>
+        /// <returns>Tuple of (baseFile path, retestFile path) or null if not found</returns>
+        public static (string? baseFile, string? retestFile) FindRelatedFiles(
+            string basename,
+            string? searchPath = null,
+            IFileReader? fileReader = null)
         {
+            fileReader ??= new FileReader();
+
             // Remove .htm extension if present
             if (basename.EndsWith(ParsingConstants.FILE_EXTENSION_HTM))
             {
@@ -152,8 +184,8 @@ namespace CucumberParser.Parsing
                 retestFile = Path.Combine(searchPath, retestFile);
             }
 
-            var baseExists = File.Exists(baseFile);
-            var retestExists = File.Exists(retestFile);
+            var baseExists = fileReader.FileExists(baseFile);
+            var retestExists = fileReader.FileExists(retestFile);
 
             return (baseExists ? baseFile : null, retestExists ? retestFile : null);
         }

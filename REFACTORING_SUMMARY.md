@@ -169,33 +169,83 @@ a16d40a Refactor Phase 1: Fix nullable reference type annotations
 163d342 Initial commit: CucumberParser for Ruby Cucumber HTML reports
 ```
 
-## Future Enhancements (Optional Phase 2)
+## Phase 2 Refactoring: Improve Maintainability
 
-While Phase 1 focused on low-risk structural improvements, here are potential Phase 2 enhancements:
+**Commit:** `ff81a5e`
 
-### Potential Improvements
-1. **Remove inefficient convenience methods** (lines 713-747 in original)
-   - Methods like `GetDuration()`, `GetScenariosTotal()` re-parse HTML each time
-   - Could be removed or optimized with caching
+Phase 2 focused on improving code maintainability by removing inefficiencies, extracting business logic, and simplifying complex methods.
 
-2. **Extract business logic from models**
-   - Move `Scenario.CalculateStatus()` to a service class
-   - Separate data from behavior
+### Step 1: Remove Inefficient Convenience Methods
 
-3. **Introduce interfaces for testability**
+**Changes:**
+- Removed 7 convenience methods: `GetDuration()`, `GetScenariosTotal()`, `GetScenariosPassed()`, `GetScenariosFailed()`, `GetStepsTotal()`, `GetStepsPassed()`, `GetStepsFailed()`
+- These methods re-parsed HTML content on every call (very inefficient)
+- Updated README to show better approach: use `ParseCucumberHtml()` once and access properties directly
+- Reduced `CucumberParserFunctions.cs` by 35 lines
+
+**Benefits:**
+- ✅ Eliminated unnecessary HTML re-parsing
+- ✅ Improved performance
+- ✅ Cleaner API surface
+
+### Step 2: Extract Business Logic from Models
+
+**Changes:**
+- Created new `ScenarioStatusCalculator` service class
+- Moved status calculation logic out of `Scenario` model
+- `Scenario.CalculateStatus()` now delegates to the service
+- Clear separation: Models contain data, Services contain behavior
+
+**Benefits:**
+- ✅ Better separation of concerns (data vs behavior)
+- ✅ Follows Single Responsibility Principle
+- ✅ Easier to test status calculation logic independently
+- ✅ More maintainable and extensible
+
+### Step 3: Simplify Complex Methods in Program.cs
+
+**Changes:**
+- Created `CommandLineArgs` class to hold parsed arguments (cleaner than 6 separate variables)
+- Extracted `ParseCommandLineArguments()` method (40 lines)
+- Extracted `DetermineSearchDirectory()` method (25 lines)
+- Extracted `ParseFiles()` method (26 lines)
+- Simplified `Main()` from 130 lines to ~40 lines
+- Each method now has a single, clear responsibility
+
+**Benefits:**
+- ✅ Main() is now easy to understand at a glance
+- ✅ Each extracted method can be tested independently
+- ✅ Improved readability and maintainability
+- ✅ Clear separation of concerns (parsing args vs running parser vs parsing files)
+
+**Results:**
+- ✅ Removed 35 lines of inefficient code
+- ✅ Added new service class for better architecture
+- ✅ Simplified Program.cs significantly
+- ✅ Build succeeds with 0 warnings
+- ✅ All functionality preserved
+
+---
+
+## Future Enhancements (Optional Phase 3)
+
+While Phases 1 & 2 covered the most important improvements, here are potential Phase 3 enhancements:
+
+### Remaining Opportunities
+1. **Introduce interfaces for testability**
    - `IFileReader` for file I/O
    - `IHtmlParser` for parsing
-   - Enable dependency injection
+   - Enable dependency injection for unit testing
 
-4. **Strategy pattern for output formats**
+2. **Strategy pattern for output formats**
    - Create `IOutputFormatter` interface
    - Implementations: `JsonFormatter`, `TextFormatter`
    - Easily add CSV, XML, etc.
 
-5. **Simplify complex methods**
-   - Break down `ParseCucumberHtmlFile()` (80 lines)
-   - Simplify `OutputReports()` (120 lines)
-   - Extract nested loops in report output
+3. **Further simplify ParseCucumberHtmlFile()**
+   - Extract metadata parsing into separate method
+   - Extract HTML parsing into separate method
+   - Current: 80 lines, Target: <40 lines per method
 
 ## Validation
 
@@ -223,18 +273,46 @@ Steps: 104 total, 98 passed, 2 failed
 
 ## Conclusion
 
-Phase 1 refactoring has been completed successfully, resulting in:
-- **Cleaner, more maintainable code**
-- **Better organization and structure**
-- **Zero compiler warnings**
-- **100% preserved functionality**
-- **Solid foundation for future enhancements**
+**Phase 1 & 2 refactoring has been completed successfully!**
 
-The codebase is now much easier to understand, navigate, and extend while maintaining all original functionality.
+### What Was Accomplished
+
+**Phase 1: Foundation** (Commits: `a16d40a`, `d28a6e5`, `e8a1683`, `65565b2`)
+- Fixed all 27 nullable reference warnings
+- Extracted 60+ magic strings to constants
+- Created helper methods to reduce duplication
+- Organized code into 10 well-structured files
+
+**Phase 2: Maintainability** (Commit: `ff81a5e`)
+- Removed 7 inefficient convenience methods
+- Extracted business logic to service class
+- Simplified complex Program.cs methods
+- Improved separation of concerns
+
+### Results
+
+| Metric | Before | After Phase 1 | After Phase 2 |
+|--------|--------|---------------|---------------|
+| **Files** | 1 monolithic | 10 organized | 11 organized |
+| **Warnings** | 27 | 0 | 0 |
+| **Magic Strings** | ~40 scattered | 0 (centralized) | 0 |
+| **Main() complexity** | N/A | 130 lines | 40 lines |
+| **Inefficient methods** | N/A | 7 | 0 (removed) |
+| **Business logic in models** | Yes | Yes | No (extracted) |
+
+### Key Achievements
+- ✅ **Zero compiler warnings**
+- ✅ **Much better code organization**
+- ✅ **Improved performance** (no unnecessary re-parsing)
+- ✅ **Better separation of concerns** (models vs services vs parsing)
+- ✅ **Simplified complex methods**
+- ✅ **100% preserved functionality**
+
+The codebase is now **significantly more maintainable, performant, and extensible** while maintaining all original functionality.
 
 ---
 
 **Refactoring completed:** 2025-10-21
-**Total commits:** 4
-**Lines changed:** +1,114, -1,069
-**Files changed:** 11 files (1 deleted, 10 created)
+**Total commits:** 6 (4 Phase 1 + 1 Phase 2 + 1 Documentation)
+**Total changes:** +1,220 insertions, -1,164 deletions
+**Files changed:** 12 files

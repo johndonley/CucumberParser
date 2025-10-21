@@ -92,12 +92,7 @@ var report = CucumberParserFunctions.ParseCucumberHtml(html);
 // Parse HTML file
 var report = CucumberParserFunctions.ParseCucumberHtmlFile("path/to/report.htm");
 
-// Get specific metrics
-var duration = CucumberParserFunctions.GetDuration(html);
-var totalScenarios = CucumberParserFunctions.GetScenariosTotal(html);
-var failedSteps = CucumberParserFunctions.GetStepsFailed(html);
-
-// Access report data
+// Access report data directly (more efficient than re-parsing)
 Console.WriteLine($"Duration: {report.Duration}");
 Console.WriteLine($"Scenarios: {report.ScenariosTotal}");
 foreach (var feature in report.Features)

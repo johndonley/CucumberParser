@@ -157,41 +157,5 @@ namespace CucumberParser.Parsing
 
             return (baseExists ? baseFile : null, retestExists ? retestFile : null);
         }
-
-        // Convenience functions for direct field access
-        public static string? GetDuration(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).Duration;
-        }
-
-        public static int GetScenariosTotal(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).ScenariosTotal;
-        }
-
-        public static int GetScenariosPassed(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).ScenariosPassed;
-        }
-
-        public static int GetScenariosFailed(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).ScenariosPassed;
-        }
-
-        public static int GetStepsTotal(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).StepsTotal;
-        }
-
-        public static int GetStepsPassed(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).StepsPassed;
-        }
-
-        public static int GetStepsFailed(string htmlContent)
-        {
-            return ParseCucumberHtml(htmlContent).StepsFailed;
-        }
     }
 }

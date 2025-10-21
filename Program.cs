@@ -12,57 +12,77 @@ using CucumberParser.Parsing;
 
 namespace CucumberParser
 {
+    // Command-line arguments container
+    class CommandLineArgs
+    {
+        public string File { get; set; } = "";
+        public string Environment { get; set; } = "dev";
+        public string CustomDir { get; set; } = "";
+        public string Format { get; set; } = "text";
+        public bool Debug { get; set; } = false;
+        public List<string> Fields { get; set; } = new List<string>();
+    }
+
     // Main program
     class Program
     {
         static void Main(string[] args)
         {
-            // Parse command line arguments
-            var file = "";
-            var environment = "dev";
-            var customDir = "";
-            var format = "text";
-            var debug = false;
-            var fields = new List<string>();
+            var cmdArgs = ParseCommandLineArguments(args);
+            if (cmdArgs == null)
+            {
+                return; // Help was shown
+            }
+
+            RunParser(cmdArgs);
+        }
+
+        static CommandLineArgs? ParseCommandLineArguments(string[] args)
+        {
+            var cmdArgs = new CommandLineArgs();
 
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--env" && i + 1 < args.Length)
                 {
-                    environment = args[++i];
+                    cmdArgs.Environment = args[++i];
                 }
                 else if (args[i] == "--dir" && i + 1 < args.Length)
                 {
-                    customDir = args[++i];
+                    cmdArgs.CustomDir = args[++i];
                 }
                 else if (args[i] == "--format" && i + 1 < args.Length)
                 {
-                    format = args[++i];
+                    cmdArgs.Format = args[++i];
                 }
                 else if (args[i] == "--debug")
                 {
-                    debug = true;
+                    cmdArgs.Debug = true;
                 }
                 else if (args[i] == "--field" && i + 1 < args.Length)
                 {
-                    fields.Add(args[++i]);
+                    cmdArgs.Fields.Add(args[++i]);
                 }
                 else if (args[i] == "--help" || args[i] == "-h")
                 {
                     ShowHelp();
-                    return;
+                    return null;
                 }
                 else if (!args[i].StartsWith("--"))
                 {
-                    file = args[i];
+                    cmdArgs.File = args[i];
                 }
             }
 
-            // Declare reports dictionary at the top level
+            return cmdArgs;
+        }
+
+        static void RunParser(CommandLineArgs cmdArgs)
+        {
             Dictionary<string, CucumberReport> reports;
 
             // If no file provided, show example
-            if (string.IsNullOrEmpty(file))
+            if (string.IsNullOrEmpty(cmdArgs.File))
             {
                 Console.WriteLine("No file provided. Running with example data...\n");
                 var exampleHtml = @"
@@ -73,11 +93,37 @@ namespace CucumberParser
                 ";
                 var report = CucumberParserFunctions.ParseCucumberHtml(exampleHtml);
                 reports = new Dictionary<string, CucumberReport> { { "example", report } };
-                OutputReports(reports, format, fields);
+                OutputReports(reports, cmdArgs.Format, cmdArgs.Fields);
                 return;
             }
 
             // Determine search directory
+            string? searchDir = DetermineSearchDirectory(cmdArgs.CustomDir, cmdArgs.Environment);
+
+            // Try to find related files
+            var (baseFile, retestFile) = CucumberParserFunctions.FindRelatedFiles(cmdArgs.File, searchDir);
+
+            if (baseFile == null && retestFile == null)
+            {
+                Console.Error.WriteLine($"Error: No files found for '{cmdArgs.File}'");
+                if (!string.IsNullOrEmpty(searchDir))
+                {
+                    Console.Error.WriteLine($"  Searched in: {searchDir}");
+                }
+                Console.Error.WriteLine($"  Looking for: {cmdArgs.File}.htm or {cmdArgs.File}(retest).htm");
+                Environment.Exit(1);
+            }
+
+            // Parse the files
+            reports = ParseFiles(baseFile, retestFile, cmdArgs.Debug);
+
+            Console.WriteLine(); // Empty line after file parsing messages
+
+            OutputReports(reports, cmdArgs.Format, cmdArgs.Fields);
+        }
+
+        static string? DetermineSearchDirectory(string customDir, string environment)
+        {
             string? searchDir;
             if (!string.IsNullOrEmpty(customDir))
             {
@@ -96,29 +142,16 @@ namespace CucumberParser
             {
                 Console.WriteLine($"Warning: Directory does not exist: {searchDir}");
                 Console.WriteLine($"Searching in current directory instead.\n");
-                searchDir = null;
-            }
-            else
-            {
-                Console.WriteLine();
+                return null;
             }
 
-            // Try to find related files
-            var (baseFile, retestFile) = CucumberParserFunctions.FindRelatedFiles(file, searchDir);
+            Console.WriteLine();
+            return searchDir;
+        }
 
-            if (baseFile == null && retestFile == null)
-            {
-                Console.Error.WriteLine($"Error: No files found for '{file}'");
-                if (!string.IsNullOrEmpty(searchDir))
-                {
-                    Console.Error.WriteLine($"  Searched in: {searchDir}");
-                }
-                Console.Error.WriteLine($"  Looking for: {file}.htm or {file}(retest).htm");
-                Environment.Exit(1);
-            }
-
-            // Parse the files
-            reports = new Dictionary<string, CucumberReport>();
+        static Dictionary<string, CucumberReport> ParseFiles(string? baseFile, string? retestFile, bool debug)
+        {
+            var reports = new Dictionary<string, CucumberReport>();
 
             if (baseFile != null)
             {
@@ -142,9 +175,7 @@ namespace CucumberParser
                 }
             }
 
-            Console.WriteLine(); // Empty line after file parsing messages
-
-            OutputReports(reports, format, fields);
+            return reports;
         }
 
         static void ShowHelp()

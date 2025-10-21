@@ -19,21 +19,13 @@ namespace CucumberParser.Models
             Steps.Add(step);
         }
 
+        /// <summary>
+        /// Calculates and sets the scenario status based on step results.
+        /// Delegates to ScenarioStatusCalculator for the actual logic.
+        /// </summary>
         public void CalculateStatus()
         {
-            // If any step failed or skipped, scenario is failed
-            foreach (var step in Steps)
-            {
-                if (!string.IsNullOrEmpty(step.StepStatus) &&
-                    (step.StepStatus.ToLower().Contains(ParsingConstants.STATUS_FAILED) ||
-                     step.StepStatus.ToLower().Contains(ParsingConstants.STATUS_SKIPPED)))
-                {
-                    ScenarioStatus = ParsingConstants.STATUS_FAILED;
-                    return;
-                }
-            }
-            // All steps passed
-            ScenarioStatus = ParsingConstants.STATUS_PASSED;
+            ScenarioStatus = ScenarioStatusCalculator.CalculateStatus(this);
         }
 
         public Dictionary<string, object?> ToDict()
